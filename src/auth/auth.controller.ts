@@ -8,6 +8,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Guard } from './guard/guard.guard';
 import { Roles } from './guard/role/role.decorator';
 import { Role } from 'src/common/enum/role.enum';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
 
 @ApiTags()
 @Controller('auth')
@@ -32,18 +33,9 @@ export class AuthController {
     @ApiOperation({
     summary: 'Logout ',
     })
-    async logout(@Req() req){
-        const authHeader = req.headers['authorization'];
-        if (!authHeader) {
-        throw new UnauthorizedException('Authorization header missing');
-        }
-
-        const token = authHeader.split(' ')[1]; 
-        if (!token) {
-        throw new UnauthorizedException('Access token missing');
-        }
+    async logout(@GetUser('token') token: string){
         console.log("acces token is: ", token);
-        return this.authService.logout(token);
+      return this.authService.logout(token);
     }
 
 

@@ -8,6 +8,7 @@ import { Guard } from 'src/auth/guard/guard.guard';
 import { Roles } from 'src/auth/guard/role/role.decorator';
 import { Role } from 'src/common/enum/role.enum';
 import { PaginationDto } from './dto/paginatioin.dto';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
 
 
 @ApiTags('User')
@@ -20,9 +21,8 @@ export class UserController {
   @Roles(Role.SUPER_ADMIN)
   @Post('add-restaurant')
   @ApiOperation({ summary: 'Create restaurant admin (only super admin)' })
-  async createRestaurantAdmin(@Body() createUserDto: CreateUserDto, @Req() req): Promise<UserResponseDto> {
-    const superAdminEmail = req.user.email;
-    return this.userService.createRestaurantAdmin(createUserDto, superAdminEmail);
+  async createRestaurantAdmin(@Body() createUserDto: CreateUserDto, @GetUser('email') email:string) {
+    // return this.userService.createRestaurantAdmin(createUserDto, email);
   }
 
 
@@ -44,10 +44,8 @@ export class UserController {
   @Patch('update-information')
   @UseGuards(Guard)
   @ApiOperation({ summary: 'User update current user profile (fullName, phone, and address)' })
-  async updateMe(@Req() req, @Body() updateUserDto: UpdateUserDto){
+  async updateMe(@GetUser('sub') authId: number, @Body() updateUserDto: UpdateUserDto){
     try {
-      const authId = req.user.sub;
-      console.log("value of req.user.sub is: ", authId);
       return await this.userService.updateCustomer(authId, updateUserDto);
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -59,10 +57,7 @@ export class UserController {
   // @Roles(Role.SUPER_ADMIN)
   @Get()
   @ApiOperation({ summary: 'Get all users with pagination, (Super Admin)' })
-  @ApiQuery({ name: 'page', required: false, example: 1 })
-  @ApiQuery({ name: 'limit', required: false, enum: [10, 20], example: 10 })
-  @ApiQuery({ name: 'search', required: false, description: 'Search by fullName, phone, or address' })
-  async findAll(@Query() paginationDto: PaginationDto, @Req() req) {
+  async findAll(@Query() paginationDto: PaginationDto) {
     return this.userService.findAll(paginationDto);
   }
 
@@ -71,13 +66,7 @@ export class UserController {
   @Roles(Role.CUSTOMER, Role.RESTAURANT_ADMIN, Role.SUPER_ADMIN)
   @Get('profile')
   @ApiOperation({ summary: 'Get current logged-in user profile' })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns the profile of the logged-in user',
-    type: UserResponseDto,
-  })
-  findOne(@Req() req): Promise<UserResponseDto> {
-    const authId = req.user.sub; 
+  findOne(@GetUser('sub') authId: number): Promise<UserResponseDto> {
     return this.userService.findOne(authId);
   }
 
@@ -86,8 +75,7 @@ export class UserController {
   @Roles(Role.SUPER_ADMIN, Role.CUSTOMER, Role.RESTAURANT_ADMIN)
   @Delete('delete-account')
   @ApiOperation({ summary: 'Delete current logged-in user account' })
-  remove(@Req() req) {
-    const authId = req.user.sub;
+  remove(@GetUser('sub') authId: number) {
     return this.userService.remove(authId);
   }
 

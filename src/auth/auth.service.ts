@@ -11,12 +11,14 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { EmailService } from 'src/email/email.service';
 import { ValidatateTokenDto } from './dto/validate-token.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AuthService {
     constructor(@InjectRepository(Auth) private authRepository: Repository<Auth>,
             private readonly jwtService: JwtService,
             private readonly sessionService: SessionService,
-            private readonly emailService: EmailService){}
+            private readonly emailService: EmailService,
+            private readonly configService: ConfigService){}
 
     // create new account
     async createAuthUser(createAuthDto: CreateAuthDto): Promise<Auth> {
@@ -42,51 +44,57 @@ export class AuthService {
 
     // login user
     async loginUser(loginDto: LoginDto){
-        try{
+        try {
             const authUser = await this.authRepository.findOne({
-                where:{email: loginDto.email}
+            where: { email: loginDto.email },
             });
-            if(!authUser) throw new NotFoundException("invalid email");
-            // password matching
+
+            if (!authUser) {
+            throw new NotFoundException('Invalid email');
+            }
+
             const isMatch = await bcrypt.compare(loginDto.password, authUser.password);
             if (!isMatch) {
-            throw new BadRequestException('Your password is not correct');
+            throw new BadRequestException('Invalid credentials');
             }
-            const payload = {
-                sub: authUser.id,
-                email: authUser.email,
-                role: authUser.role
-            }
+
+            const payload = { sub: authUser.id, email: authUser.email, role: authUser.role };
+
             const [accessToken, refreshToken] = await Promise.all([
-                this.jwtService.signAsync(payload, {
-                    expiresIn: '1d',
-                    secret: process.env.JWT_ACCESS_SECRET,
-                }),
-                this.jwtService.signAsync(payload, {
-                    expiresIn: '7d',
-                    secret: process.env.JWT_REFRESH_SECRET,
-                }),
+            this.jwtService.signAsync(payload, {
+                expiresIn: this.configService.get<string>('JWT_ACCESS_EXPIRES') || '1d',
+                secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+            }),
+            this.jwtService.signAsync(payload, {
+                expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES') || '7d',
+                secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+            }),
             ]);
+
             const expiresAt = new Date();
-            expiresAt.setDate(expiresAt.getDate() + 7); 
+            expiresAt.setDate(expiresAt.getDate() + 7);
 
             await this.sessionService.createSession({
-                auth: authUser,
-                accessToken,
-                refreshToken,
-                expiresAt,
+            auth: authUser,
+            accessToken,
+            refreshToken,
+            expiresAt,
             });
 
-
             return {
-                    message: 'Login successful',
-                    token: { accessToken, refreshToken },
-                };
-            }
-        catch(error){
-            throw new NotFoundException(error.message);
+            user: {
+                id: authUser.id,
+                email: authUser.email,
+                role: authUser.role,
+            },
+            accessToken,
+            refreshToken,
+            };
+        } catch (error) {
+            throw new BadRequestException(error.message);
         }
     }
+
 
     // logout user
     async logout(accessToken: string){

@@ -13,28 +13,28 @@ import { Session } from './session/entity/session.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host:'localhost',
-      port: 5432,
-      password: '1234',
-      username: 'postgres',
-      entities: [Auth, User, Session],
-      database: 'food_backend',
-      synchronize: true,
-      logging: true,
-    }),
+    // TypeOrmModule.forRoot({
+    //   type: 'postgres',
+    //   host:'localhost',
+    //   port: 5432,
+    //   password: '1234',
+    //   username: 'postgres',
+    //   entities: [Auth, User, Session],
+    //   database: 'food_backend',
+    //   synchronize: true,
+    //   logging: true,
+    // }),
     ConfigModule.forRoot({ isGlobal: true }), 
-  // TypeOrmModule.forRootAsync({
-  //   imports: [ConfigModule],
-  //   inject: [ConfigService],
-  //   useFactory: (configService: ConfigService) => ({
-  //     type: 'postgres',
-  //     url: configService.get<string>('SUPABASE_DB'),
-  //     autoLoadEntities: true,
-  //     synchronize: true,
-  //   }),
-  // }),
+  TypeOrmModule.forRootAsync({
+    imports: [ConfigModule],
+    inject: [ConfigService],
+    useFactory: (configService: ConfigService) => ({
+      type: 'postgres',
+      url: configService.get<string>('SUPABASE_DB'),
+      autoLoadEntities: true,
+      synchronize: true,
+    }),
+  }),
     AuthModule, SessionModule, UserModule, EmailModule],
   controllers: [AppController],
   providers: [AppService],

@@ -3,11 +3,13 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { ROLES_KEY } from './role/role.decorator';
 import { SessionService } from 'src/session/session.service';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class Guard implements CanActivate {
   constructor(private reflector: Reflector,
               private jwtService: JwtService, 
-              private sessionService: SessionService
+              private sessionService: SessionService,
+              private configService: ConfigService
   ){}
   async canActivate(
     context: ExecutionContext,
@@ -23,15 +25,13 @@ export class Guard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
     if (!token) throw new UnauthorizedException('Missing token');
     const payload = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_ACCESS_SECRET,
+        secret: this.configService.get<string>('JWT_ACCESS_SECRET')
       });
     if(!payload){
       throw new UnauthorizedException('Invalid or expire token');
     }
     const filter: any = { accessToken: token };
-    if (payload.role === 'restaurant_admin') filter.restaurant_admin = payload.sub;
-    if (payload.role === 'customer') filter.customer_id = payload.sub;
-    if (payload.role === 'super_admin') filter.super_admin = payload.sub;
+    console.log("value of payload is; ", payload);
     const session = await this.sessionService.findSessionByAccessToken(filter);
     if(!session) throw new UnauthorizedException("Session not found");
 
