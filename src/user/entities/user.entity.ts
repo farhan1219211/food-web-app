@@ -13,7 +13,7 @@ import { Role } from '../../common/enum/role.enum';
 import { Auth } from 'src/auth/entity/auth.entity';
 import { IsOptional } from 'class-validator';
 import { Session } from 'src/session/entity/session.entity';
-import { RestaurantProfile } from 'src/restaurant-profile/entities/restaurant-profile.entity';
+import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
 
 @Entity()
 export class User {
@@ -60,8 +60,8 @@ export class User {
     @DeleteDateColumn()
     deletedAt: Date;
 
-    @OneToOne(() => RestaurantProfile, (restaurant) => restaurant.restaurantAdmin)
-    restaurantProfile: RestaurantProfile;
+    @OneToOne(() => Restaurant, (restaurant) => restaurant.restaurantAdmin)
+    restaurant: Restaurant;
 
 
     from(userDto: CreateUserDto) {

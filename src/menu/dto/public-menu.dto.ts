@@ -1,9 +1,17 @@
-import { OmitType } from "@nestjs/swagger";
-import { MenuItemDto } from "./menu-item.dto";
+import { PickType } from "@nestjs/swagger";
+import { MenuDto } from "./menu.dto";
 import { Expose } from "class-transformer";
 
-export class MenuItemResponseDto extends OmitType(MenuItemDto, [
-  'updatedAt',
+export class PublicMenuDto extends PickType(MenuDto, [
+  'id',
+  'name',
+  'description',
+  'price',
+  'isAvailable',
+  'imageUrl',
+  'restaurantId',
+  'cuisineId',
+  'createdAt',
 ] as const) {
   @Expose()
   id: number;

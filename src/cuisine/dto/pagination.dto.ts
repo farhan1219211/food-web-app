@@ -14,14 +14,12 @@ export class CuisinePaginationDto {
   page: number = 1;
 
   @ApiPropertyOptional({
-    description: 'Number of items per page (only 10 or 20 allowed)',
-    enum: [10, 20],
+    description: 'Number of items per page ',
     example: 10,
     default: 10,
   })
   @Type(() => Number)
   @IsInt()
-  @IsIn([10, 20], { message: 'limit must be either 10 or 20' })
   limit: number = 10;
 
   @ApiPropertyOptional({

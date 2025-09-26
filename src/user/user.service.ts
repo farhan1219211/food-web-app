@@ -13,6 +13,7 @@ import { Auth } from 'src/auth/entity/auth.entity';
 import { SessionService } from 'src/session/session.service';
 import { toUserResponse, UserResponse } from 'src/common/utils/user.mapper';
 import { Role } from 'src/common/enum/role.enum';
+import { not } from 'rxjs/internal/util/not';
 
 @Injectable()
 export class UserService {
@@ -39,25 +40,41 @@ export class UserService {
     }
 
     // update the user
-    async updateCustomer(userId: number, updateUserDto: UpdateUserDto): Promise<UserResponse> {
-        try {
-            const user = await this.userRepository.findOne({
-                where: { id: userId },
-            });
+    // async updateCustomer(userId: number, updateUserDto: UpdateUserDto): Promise<UserResponse> {
+    //     try {
+    //         const user = await this.userRepository.findOne({
+    //             where: { id: userId },
+    //         });
 
-            if (!user) {
-                throw new NotFoundException('User not found');
+    //         if (!user) {
+    //             throw new NotFoundException('User not found');
+    //         }
+
+    //         // Only fullName, phone and address will be updated
+    //         Object.assign(user, updateUserDto);
+
+    //         const updatedUser = await this.userRepository.save(user);
+
+    //         return toUserResponse(user);
+    //     } catch (error) {
+    //         throw new NotFoundException(error.message);
+    //     }
+    // }
+
+    async updateCustomer(userId: number, updateUserDto: UpdateUserDto){
+        try{
+            const result = await this.userRepository.update({
+                id: userId
+            },
+            updateUserDto
+            );
+            if(result.affected === 0){
+                throw new NotFoundException(`User with ID ${userId} not found`);
             }
-
-            // Only fullName, phone and address will be updated
-            Object.assign(user, updateUserDto);
-
-            const updatedUser = await this.userRepository.save(user);
-
-            return toUserResponse(user);
-        } catch (error) {
-            throw new NotFoundException(error.message);
-        }
+            return {message: 'User updated successfully'}
+        }catch(error){
+               throw new NotFoundException(error.message);
+        } 
     }
 
     // get all users

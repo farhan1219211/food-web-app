@@ -1,21 +1,21 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, ClassSerializerInterceptor, ParseIntPipe, Query } from '@nestjs/common';
-import { MenuItemsService } from './menu-items.service';
-import { CreateMenuItemDto } from './dto/create-menu-item.dto';
-import { UpdateMenuItemDto } from './dto/update-menu-item.dto';
+import { MenuService } from './menu.service';
+import { CreateMenuDto } from './dto/create-menu.dto';
+import { UpdateMenuDto } from './dto/update-menu.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Guard } from 'src/common/guard/guard.guard';
 import { Roles } from 'src/common/guard/role/role.decorator';
 import { Role } from 'src/common/enum/role.enum';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { User } from 'src/user/entities/user.entity';
-import { PublicMenuItemDto } from './dto/public-menu-items.dto';
-import { MenuItemPaginationDto } from './dto/menu-item-pagination.dto';
+import { PublicMenuDto } from './dto/public-menu.dto';
+import { MenuPaginationDto } from './dto/menu-pagination.dto';
 import { AdminMenuPaginationDto } from './dto/admin-menu-pagination.dto';
 
-@ApiTags('Menu Items')
-@Controller('menu-items')
-export class MenuItemsController {
-  constructor(private readonly menuItemsService: MenuItemsService) {}
+@ApiTags('Menu')
+@Controller('menu')
+export class MenuController {
+  constructor(private readonly menuService: MenuService) {}
 
 
   @Post('add-menu')
@@ -23,16 +23,18 @@ export class MenuItemsController {
   @UseGuards(Guard)
   @Roles(Role.RESTAURANT_ADMIN)
   @ApiOperation({ summary: 'Add a new menu item (Restaurant Admin only)' })
-  create(@GetUser() resAdmin: User,@Body() createMenuItemDto: CreateMenuItemDto){
-    return this.menuItemsService.create(resAdmin, createMenuItemDto);
+  create(@GetUser() resAdmin: User,@Body() createMenuDto: CreateMenuDto){
+    return this.menuService.create(resAdmin, createMenuDto);
   }
 
 
   // search menu
   @Get('search')
+  @ApiBearerAuth()
+  @UseGuards(Guard)
   @ApiOperation({ summary: 'Search menu items with pagination & filters' })
-  async searchMenu(@Query() query: MenuItemPaginationDto) {
-      return await this.menuItemsService.searchMenu(query);
+  async searchMenu(@Query() query: MenuPaginationDto) {
+      return await this.menuService.searchMenu(query);
   }
 
   // restaurant admin get his all items places inside menu
@@ -43,7 +45,7 @@ export class MenuItemsController {
   @ApiOperation({ summary: 'Get paginated menu items for the logged-in restaurant admin' })
   async getMyMenu(@GetUser() admin: User, @Query() pagination: AdminMenuPaginationDto,
   ) {
-    return this.menuItemsService.findByAdmin(admin.id, pagination);
+    return this.menuService.findByAdmin(admin.id, pagination);
   }
 
 
@@ -55,9 +57,9 @@ export class MenuItemsController {
   update(
     @GetUser() resAdmin: User,
     @Param('id', ParseIntPipe) menuId: number,
-    @Body() updateMenuItemDto: UpdateMenuItemDto,
+    @Body() updateMenuDto: UpdateMenuDto,
   ) {
-    return this.menuItemsService.update(resAdmin, menuId, updateMenuItemDto);
+    return this.menuService.update(resAdmin, menuId, updateMenuDto);
   }
 
   // delete menu
@@ -70,7 +72,7 @@ export class MenuItemsController {
     @Param('id', ParseIntPipe) id: number,
     @GetUser() user: User,
   ) {
-    return this.menuItemsService.remove(id, user);
+    return this.menuService.remove(id, user);
   }
 
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException, BadRequestException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Cuisine } from './entities/cuisine.entity';
@@ -79,7 +79,6 @@ export class CuisineService {
     }
   }
 
-
   // search cuisine by id
   async findOne(id: number):Promise<Cuisine> {
     try {
@@ -95,42 +94,25 @@ export class CuisineService {
     }
   }
 
-  // update the cuisine name if want
-  async update(id: number, updateCuisineDto: UpdateCuisineDto): Promise<CuisineResponseDto> {
+  // update the cuisine name
+  async update(id: number, updateCuisineDto: UpdateCuisineDto) {
     try {
-      const cuisine = await this.cuisineRepository.findOne({ where: { id } });
+      const result = await this.cuisineRepository.update({ id }, updateCuisineDto);
 
-      if (!cuisine) {
-        throw new NotFoundException(`Cuisine with ID "${id}" not found`);
+      if (result.affected === 0) {
+        throw new NotFoundException(`Cuisine with ID ${id} not found`);
       }
 
-      // normilizatioin
-      const normalizedName =
-        updateCuisineDto.name.charAt(0).toUpperCase() +
-        updateCuisineDto.name.slice(1).toLowerCase();
-
-      // checking duplication
-      const existingCuisine = await this.cuisineRepository.findOne({
-        where: { name: normalizedName },
-      });
-
-      if (existingCuisine && existingCuisine.id !== id) {
-        throw new BadRequestException(
-          `Cuisine with name ${normalizedName} already exists`,
-        );
-      }
-
-      // update
-      cuisine.name = normalizedName;
-      const updatedCuisine = await this.cuisineRepository.save(cuisine);
-
-      return { id: updatedCuisine.id, name: updatedCuisine.name };
+      return { message: 'Cuisine updated successfully' };
     } catch (error) {
-      throw new BadRequestException(error.message);
+      if (error.code === '23505') {
+        throw new ConflictException(`Cuisine with name ${updateCuisineDto.name} already exists`);
+      }
+
+      throw new BadRequestException(error.message || 'Failed to update cuisine');
     }
   }
-
-
+  
   // delete the cuisine 
   async remove(id: number): Promise<{ message: string }> {
     try {
@@ -162,7 +144,25 @@ export class CuisineService {
     }
   }
 
+  // find cuisines by name
+  async findAllByIds(ids: number[]): Promise<Cuisine[]> {
+    try {
+      const cuisines = await this.cuisineRepository.findBy({ id: In(ids) });
 
+      if (!cuisines || cuisines.length === 0) {
+        throw new NotFoundException('No cuisines found for the given IDs');
+      }
+
+      if (cuisines.length !== ids.length) {
+        const foundIds = cuisines.map(c => c.id);
+        const missingIds = ids.filter(id => !foundIds.includes(id));
+        throw new NotFoundException( `Cuisines not found for IDs: ${missingIds.join(', ')}`);
+      }
+      return cuisines;
+    } catch (error) {
+        throw new NotFoundException(error.message);
+    }
+  }
 
 
 }

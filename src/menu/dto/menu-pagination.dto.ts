@@ -1,8 +1,8 @@
 import { Type } from 'class-transformer';
-import { IsInt, IsIn, IsOptional, Min, IsNumber, IsString } from 'class-validator';
+import { IsInt, IsOptional, Min, IsNumber, IsString } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
-export class MenuItemPaginationDto {
+export class MenuPaginationDto {
   @ApiPropertyOptional({
     description: 'Page number (must be ≥ 1)',
     example: 1,
@@ -15,13 +15,11 @@ export class MenuItemPaginationDto {
 
   @ApiPropertyOptional({
     description: 'Number of items per page (only 10 or 20 allowed)',
-    enum: [10, 20],
     example: 10,
     default: 10,
   })
   @Type(() => Number)
   @IsInt()
-  @IsIn([10, 20], { message: 'limit must be either 10 or 20' })
   limit: number = 10;
 
   @ApiPropertyOptional({

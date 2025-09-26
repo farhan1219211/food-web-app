@@ -42,7 +42,6 @@ export class AuthController {
     @Post('add-restaurant')
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiOperation({ summary: 'Create restaurant admin and profile (only super admin)' })
-    @ApiNoContentResponse({description: 'Restaurant admin created successfully. No content returned.', })
     async createRestaurantAdmin( @Body()  dto: CreateRestaurantDto, @GetUser('email') superAdminEmail: string): Promise<void> {
         await this.authService.createRestaurantAdmin(dto, superAdminEmail);
     }

@@ -1,8 +1,8 @@
 import { PickType } from "@nestjs/swagger";
-import { MenuItemDto } from "./menu-item.dto";
+import { MenuDto } from "./menu.dto";
 
 // For creating a new menu item
-export class CreateMenuItemDto extends PickType(MenuItemDto, [
+export class CreateMenuDto extends PickType(MenuDto, [
   'name',
   'description',
   'price',

@@ -1,7 +1,7 @@
 import { IsInt, IsString, IsNumber, IsOptional, IsBoolean, IsDate, IsUrl, MinLength, Min, IsNotEmpty } from 'class-validator';
-import { PickType, PartialType, OmitType, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class MenuItemDto {
+export class MenuDto {
   @ApiProperty({ example: 1 })
   @IsInt()
   id: number;
@@ -47,11 +47,3 @@ export class MenuItemDto {
   @IsDate()
   updatedAt: Date;
 }
-
-
-
-
-
-
-
-

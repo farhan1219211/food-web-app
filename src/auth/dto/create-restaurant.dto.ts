@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsEmail, MinLength, IsEnum, IsPhoneNumber, IsNumber, IsOptional } from 'class-validator';
-import { BusinessType } from '../../restaurant-profile/enums/business-type.enum';
+import { BusinessType } from '../../restaurant/enums/business-type.enum';
 import { Type } from 'class-transformer';
 
 export class CreateRestaurantDto {

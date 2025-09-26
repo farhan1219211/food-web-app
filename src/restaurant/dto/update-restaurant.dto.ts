@@ -1,10 +1,8 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsEnum, IsNumber, IsPhoneNumber, IsArray, ValidateNested } from 'class-validator';
+import { IsOptional, IsString, IsEnum, IsNumber, IsPhoneNumber, IsArray, ValidateNested, IsInt } from 'class-validator';
 import { Type } from 'class-transformer';
-import { BusinessType } from '../enums/business-type.enum';
-import { CreateCuisineDto } from '../../cuisine/dto/create-cuisine.dto';
 
-export class UpdateRestaurantProfileDto {
+export class UpdateRestaurantDto {
 
   @ApiPropertyOptional({ example: '+0514862581', description: 'Primary phone number' })
   @IsOptional()
@@ -26,12 +24,13 @@ export class UpdateRestaurantProfileDto {
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ type: [CreateCuisineDto], isArray: true, description: 'List of cuisines served by the restaurant' })
+  @ApiPropertyOptional({ type: [Number], description: 'List of cuisine IDs served by the restaurant', example: [1, 2, 3] })
   @IsOptional()
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CreateCuisineDto)
-  cuisines?: CreateCuisineDto[];
+  @IsInt({ each: true })
+  @Type(() => Number)   
+  cuisines?: number[];
+
 
   @ApiPropertyOptional({ example: 1, description: 'Minimum order amount' })
   @IsOptional()

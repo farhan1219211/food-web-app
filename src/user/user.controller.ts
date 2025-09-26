@@ -7,6 +7,8 @@ import {
     Delete,
     UseGuards,
     Query,
+    HttpCode,
+    HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -26,10 +28,11 @@ export class UserController {
 
     // update the profile of the user
     @Patch('update-information')
+    @HttpCode(HttpStatus.NO_CONTENT)
     @UseGuards(Guard)
     @ApiOperation({ summary: 'User update current user profile (fullName, phone, and address)' })
     async updateMe(@GetUser('id') userId: number, @Body() updateUserDto: UpdateUserDto,
-    ): Promise<UserResponse> {
+    ){
         return this.userService.updateCustomer(userId, updateUserDto);
     }
 

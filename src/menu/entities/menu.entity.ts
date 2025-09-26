@@ -5,15 +5,15 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
-  JoinColumn,
   RelationId,
 } from 'typeorm';
-import { RestaurantProfile } from 'src/restaurant-profile/entities/restaurant-profile.entity';
+import { Restaurant
+ } from 'src/restaurant/entities/restaurant.entity';
 import { Cuisine } from 'src/cuisine/entities/cuisine.entity';
-import { CreateMenuItemDto } from '../dto/create-menu-item.dto';
+import { CreateMenuDto } from '../dto/create-menu.dto';
 
 @Entity()
-export class MenuItem {
+export class Menu {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -32,14 +32,14 @@ export class MenuItem {
   @Column({ nullable: true })
   imageUrl: string;
 
-  @ManyToOne(() => RestaurantProfile, (restaurant) => restaurant.menuItems, {onDelete: 'CASCADE'})
-  restaurant: RestaurantProfile;
-  @RelationId((menuItem: MenuItem) => menuItem.restaurant)
+  @ManyToOne(() => Restaurant, (restaurant) => restaurant.menu, {onDelete: 'CASCADE'})
+  restaurant: Restaurant;
+  @RelationId((menu: Menu) => menu.restaurant)
   restaurantId: number;
 
-  @ManyToOne(() => Cuisine, (cuisine) => cuisine.menuItems, {nullable: true, onDelete: 'SET NULL'})
+  @ManyToOne(() => Cuisine, (cuisine) => cuisine.menu, {nullable: true, onDelete: 'SET NULL'})
   cuisine: Cuisine;
-  @RelationId((menuItem: MenuItem) => menuItem.cuisine)
+  @RelationId((menu: Menu) => menu.cuisine)
   cuisineId: number;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -48,7 +48,7 @@ export class MenuItem {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-from(dto: CreateMenuItemDto) {
+from(dto: CreateMenuDto) {
   this.name = dto.name;
   this.description = dto.description ?? '';
   this.price = dto.price;

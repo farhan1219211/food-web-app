@@ -26,14 +26,12 @@ export class RestaurantPaginationDto {
 
   @ApiPropertyOptional({
     description: 'Number of items per page (only 10 or 20 allowed)',
-    enum: [2, 20],
     example: 10,
     default: 10,
   })
   @Type(() => Number)
   @IsInt()
-  @IsIn([2, 20], { message: 'limit must be either 10 or 20' })
-  limit: number = 2;
+  limit: number = 10;
 
   @ApiPropertyOptional({
     description: 'Search by name, phone, or city (case-insensitive)',

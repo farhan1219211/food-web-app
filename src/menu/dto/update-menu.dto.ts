@@ -1,9 +1,8 @@
 import { PartialType, PickType } from "@nestjs/swagger";
-import { MenuItemDto } from "./menu-item.dto";
 import { Expose } from "class-transformer";
-import { CreateMenuItemDto } from "./create-menu-item.dto";
+import { CreateMenuDto } from "./create-menu.dto";
 
-export class UpdateMenuItemDto extends PartialType(CreateMenuItemDto) {
+export class UpdateMenuDto extends PartialType(CreateMenuDto) {
   @Expose()
   name?: string;
 

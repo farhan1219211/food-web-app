@@ -8,9 +8,9 @@ import { Auth } from './auth/entity/auth.entity';
 import { User } from './user/entities/user.entity';
 import { Session } from './session/entity/session.entity';
 import { EmailModule } from './email/email.module';
-import { RestaurantProfileModule } from './restaurant-profile/restaurant-profile.module';
+import { RestaurantModule } from './restaurant/restaurant.module';
 import { CuisineModule } from './cuisine/cuisine.module';
-import { MenuItemsModule } from './menu-items/menu-items.module';
+import { MenuModule } from './menu/menu.module';
 
 @Module({
     imports: [
@@ -44,9 +44,9 @@ import { MenuItemsModule } from './menu-items/menu-items.module';
         SessionModule,
         UserModule,
         EmailModule,
-        RestaurantProfileModule,
+        RestaurantModule,
         CuisineModule,
-        MenuItemsModule,
+        MenuModule,
     ],
 })
 export class AppModule {}

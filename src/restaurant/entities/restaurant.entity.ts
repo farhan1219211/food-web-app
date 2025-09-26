@@ -16,16 +16,15 @@ import { BusinessType } from '../enums/business-type.enum';
 import { Cuisine } from 'src/cuisine/entities/cuisine.entity';
 import { Point } from 'geojson';
 import { CreateRestaurantDto } from 'src/auth/dto/create-restaurant.dto';
-import { IsEnum } from 'class-validator';
-import { MenuItem } from 'src/menu-items/entities/menu-item.entity';
+import { Menu } from 'src/menu/entities/menu.entity';
 
 
 @Entity()
-export class RestaurantProfile {
+export class Restaurant {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => User, (user) => user.restaurantProfile, { onDelete: 'CASCADE' })
+  @OneToOne(() => User, (user) => user.restaurant, { onDelete: 'CASCADE' })
   @JoinColumn()
   restaurantAdmin: User;
 
@@ -110,12 +109,12 @@ export class RestaurantProfile {
   @DeleteDateColumn()
   deletedAt?: Date;
 
-  @OneToMany(() => MenuItem, (menuItem) => menuItem.restaurant)
-  menuItems: MenuItem[];
+  @OneToMany(() => Menu, (menu) => menu.restaurant)
+  menu: Menu[];
 
 
-static from(dto: CreateRestaurantDto, restaurantAdmin: User): RestaurantProfile {
-  const restaurant = new RestaurantProfile();
+static from(dto: CreateRestaurantDto, restaurantAdmin: User): Restaurant {
+  const restaurant = new Restaurant();
 
   restaurant.businessName = dto.businessName;
   restaurant.businessType = dto.businessType;

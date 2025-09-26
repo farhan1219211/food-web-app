@@ -21,7 +21,7 @@ import { UserService } from 'src/user/user.service';
 import { Role } from 'src/common/enum/role.enum';
 import { EmailService } from 'src/email/email.service';
 import { toUserResponse, UserResponse } from 'src/common/utils/user.mapper';
-import { RestaurantProfileService } from 'src/restaurant-profile/restaurant-profile.service';
+import { RestaurantService } from 'src/restaurant/restaurant.service';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 
 
@@ -34,7 +34,7 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
         private readonly email: EmailService,
-        private readonly restaurantProfileService: RestaurantProfileService
+        private readonly restaurantService: RestaurantService
     ) {}
 
     // create new account
@@ -116,7 +116,7 @@ export class AuthService {
                 throw new BadRequestException('Failed to create Profile');
             }
             // creating profile of restaurant 
-            await this.restaurantProfileService.create(dto, savedUser);
+            await this.restaurantService.create(dto, savedUser);
             // email part credentials
             await this.email.sendRestaurantAdminCreationEmail(
                 savedUser.auth.email,

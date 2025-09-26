@@ -1,45 +1,44 @@
 import { BadRequestException, ConsoleLogger, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateMenuItemDto } from './dto/create-menu-item.dto';
-import { UpdateMenuItemDto } from './dto/update-menu-item.dto';
+import { CreateMenuDto } from './dto/create-menu.dto';
+import { UpdateMenuDto } from './dto/update-menu.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MenuItem } from './entities/menu-item.entity';
+import { Menu } from './entities/menu.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
-import { RestaurantProfileService } from 'src/restaurant-profile/restaurant-profile.service';
+import { RestaurantService } from 'src/restaurant/restaurant.service';
 import { CuisineService } from 'src/cuisine/cuisine.service';
-import { PublicMenuItemDto } from './dto/public-menu-items.dto';
+import { PublicMenuDto } from './dto/public-menu.dto';
 import { plainToInstance } from 'class-transformer';
-import { MenuItemPaginationDto } from './dto/menu-item-pagination.dto';
+import { MenuPaginationDto } from './dto/menu-pagination.dto';
 import { AdminMenuPaginationDto } from './dto/admin-menu-pagination.dto';
 import { Role } from 'src/common/enum/role.enum';
 
 @Injectable()
-export class MenuItemsService {
-  constructor(@InjectRepository(MenuItem) private readonly menuItemRepository: Repository<MenuItem>,
-      private readonly restaurantProfile: RestaurantProfileService,
+export class MenuService {
+  constructor(@InjectRepository(Menu) private readonly menuRepository: Repository<Menu>,
+      private readonly restaurantService: RestaurantService,
       private readonly cuisineService: CuisineService){}
 
   // create menu item for specific restaurant
-  async create(resAdmin: User, createMenuItemDto: CreateMenuItemDto): Promise<PublicMenuItemDto>{
+  async create(resAdmin: User, createMenuDto: CreateMenuDto): Promise<PublicMenuDto>{
     try {
       // fetch profile of restaurant 
-      const restaurantProfile = await this.restaurantProfile.findByAdmin(resAdmin.id);
-      if(!restaurantProfile){
+      const restaurant = await this.restaurantService.findByAdmin(resAdmin.id);
+      if(!restaurant){
         throw new NotFoundException('Check you restaurant status')
       }
+      
 
       // fetch cuisine
-      const cuisine = await this.cuisineService.findOne(createMenuItemDto.cuisineId);
+      const cuisine = await this.cuisineService.findOne(createMenuDto.cuisineId);
 
-      // console.log("cuisiine is: ", cuisine);
-      // console.log(restaurantProfile);
-      const menuItem = new MenuItem();
-      menuItem.from(createMenuItemDto);
-      menuItem.restaurant = restaurantProfile;
-      menuItem.cuisine = cuisine;
-      console.log(menuItem);
-      const saveMenu = await this.menuItemRepository.save(menuItem);
-      return plainToInstance(PublicMenuItemDto, saveMenu, {
+      const menu = new Menu();
+      menu.from(createMenuDto);
+      menu.restaurant = restaurant;
+      menu.cuisine = cuisine;
+      console.log(menu);
+      const saveMenu = await this.menuRepository.save(menu);
+      return plainToInstance(PublicMenuDto, saveMenu, {
       excludeExtraneousValues: true,
     });
     } catch (error) {
@@ -48,21 +47,21 @@ export class MenuItemsService {
   }
 
   // restaurant admin can fetch his all orders
-  async findByAdmin(adminId: number, { page, limit }: AdminMenuPaginationDto ): Promise<{ data: PublicMenuItemDto[]; total: number; page: number; limit: number }> {
+  async findByAdmin(adminId: number, { page, limit }: AdminMenuPaginationDto ): Promise<{ data: PublicMenuDto[]; total: number; page: number; limit: number }> {
     try {
-      const qb = this.menuItemRepository
-        .createQueryBuilder('menuItem')
-        .leftJoinAndSelect('menuItem.restaurant', 'restaurant')
-        .leftJoinAndSelect('menuItem.cuisine', 'cuisine')
+      const qb = this.menuRepository
+        .createQueryBuilder('Menu')
+        .leftJoinAndSelect('Menu.restaurant', 'restaurant')
+        .leftJoinAndSelect('Menu.cuisine', 'cuisine')
         .where('restaurant.restaurantAdminId = :adminId', { adminId })
-        .orderBy('menuItem.createdAt', 'DESC')
+        .orderBy('Menu.createdAt', 'DESC')
         .skip((page - 1) * limit)
         .take(limit);
 
       const [items, total] = await qb.getManyAndCount();
 
       const data = items.map(item =>
-        plainToInstance(PublicMenuItemDto, item, {
+        plainToInstance(PublicMenuDto, item, {
           excludeExtraneousValues: true,
         }),
       );
@@ -74,33 +73,34 @@ export class MenuItemsService {
   }
 
   // update the menu
-  async update( resAdmin: User, menuId: number, updateMenuItemDto: UpdateMenuItemDto,): Promise<UpdateMenuItemDto> {
+  async update( resAdmin: User, menuId: number, updateMenuDto: UpdateMenuDto,): Promise<UpdateMenuDto> {
     try {
       // fetch restaurant profile
-      const restaurantProfile = await this.restaurantProfile.findByAdmin(resAdmin.id);
-      if (!restaurantProfile) {
+      const restaurant = await this.restaurantService.findByAdmin(resAdmin.id);
+      if (!restaurant) {
         throw new NotFoundException('Check your restaurant status');
       }
 
+
       // find menu item
-      const menuItem = await this.menuItemRepository.findOne({
-        where: { id: menuId, restaurant: { id: restaurantProfile.id } },
+      const Menu = await this.menuRepository.findOne({
+        where: { id: menuId, restaurant: { id: restaurant.id } },
         relations: ['restaurant', 'cuisine'],
       });
-      if (!menuItem) {
+      if (!Menu) {
         throw new NotFoundException('Menu item not found');
       }
 
       // cuisine match
-      if (updateMenuItemDto.cuisineId) {
-        const cuisine = await this.cuisineService.findOne(updateMenuItemDto.cuisineId);
-        menuItem.cuisine = cuisine;
+      if (updateMenuDto.cuisineId) {
+        const cuisine = await this.cuisineService.findOne(updateMenuDto.cuisineId);
+        Menu.cuisine = cuisine;
       }
 
       //update the object
-      Object.assign(menuItem, updateMenuItemDto);
-      const updatedMenu = await this.menuItemRepository.save(menuItem);
-      return plainToInstance(UpdateMenuItemDto, updatedMenu, {
+      Object.assign(Menu, updateMenuDto);
+      const updatedMenu = await this.menuRepository.save(Menu);
+      return plainToInstance(UpdateMenuDto, updatedMenu, {
         excludeExtraneousValues: true,
       });
     } catch (error) {
@@ -110,31 +110,31 @@ export class MenuItemsService {
 
   // search from menu
   async searchMenu(
-    queryDto: MenuItemPaginationDto,
-  ): Promise<{ data: PublicMenuItemDto[]; total: number; page: number; limit: number }> {
+    queryDto: MenuPaginationDto,
+  ): Promise<{ data: PublicMenuDto[]; total: number; page: number; limit: number }> {
     const { page, limit, search, minPrice, maxPrice, cuisine, restaurant } = queryDto;
 
     try {
-      const qb = this.menuItemRepository
-        .createQueryBuilder('menuItem')
-        .leftJoinAndSelect('menuItem.restaurant', 'restaurant')
-        .leftJoinAndSelect('menuItem.cuisine', 'cuisine')
+      const qb = this.menuRepository
+        .createQueryBuilder('Menu')
+        .leftJoinAndSelect('Menu.restaurant', 'restaurant')
+        .leftJoinAndSelect('Menu.cuisine', 'cuisine')
         .innerJoin('restaurant.restaurantAdmin', 'user') 
         .where('restaurant.deletedAt IS NULL')          
         .andWhere('user.deletedAt IS NULL');           
 
       if (search) {
         qb.andWhere(
-          '(menuItem.name ILIKE :search OR menuItem.description ILIKE :search)',
+          '(Menu.name ILIKE :search OR Menu.description ILIKE :search)',
           { search: `%${search}%` },
         );
       }
 
       if (minPrice) {
-        qb.andWhere('menuItem.price >= :minPrice', { minPrice });
+        qb.andWhere('Menu.price >= :minPrice', { minPrice });
       }
       if (maxPrice) {
-        qb.andWhere('menuItem.price <= :maxPrice', { maxPrice });
+        qb.andWhere('Menu.price <= :maxPrice', { maxPrice });
       }
 
       if (cuisine) {
@@ -152,7 +152,7 @@ export class MenuItemsService {
       const [items, total] = await qb.getManyAndCount();
 
       const data = items.map(item =>
-        plainToInstance(PublicMenuItemDto, item, {
+        plainToInstance(PublicMenuDto, item, {
           excludeExtraneousValues: true,
         }),
       );
@@ -165,23 +165,23 @@ export class MenuItemsService {
   // remove menu items by specific restaurant
   async remove(id: number, user: User): Promise<{ message: string }> {
     try {
-      const menuItem = await this.menuItemRepository.findOne({
+      const Menu = await this.menuRepository.findOne({
         where: { id },
         relations: ['restaurant', 'restaurant.restaurantAdmin'],
       });
 
-      if (!menuItem) {
+      if (!Menu) {
         throw new NotFoundException(`Menu item with ID ${id} not found`);
       }
-      console.log(menuItem);
+      console.log(Menu);
 
       // check permissions
       if (user.role === Role.RESTAURANT_ADMIN) {
-        if (menuItem.restaurant.restaurantAdmin.id !== user.id) {
+        if (Menu.restaurant.restaurantAdmin.id !== user.id) {
           throw new ForbiddenException('You are not allowed to delete this menu item');
         }
       }
-      await this.menuItemRepository.remove(menuItem);
+      await this.menuRepository.remove(Menu);
       return { message: `Menu item with ID ${id} removed successfully` };
     } catch (error) {
       throw new BadRequestException('Failed to remove menu item: ' + error.message);

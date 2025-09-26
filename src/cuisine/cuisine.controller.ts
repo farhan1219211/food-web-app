@@ -8,8 +8,10 @@ import {
   Delete,
   Query,
   UseGuards,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
-import { ApiTags, ApiQuery, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiQuery, ApiOperation, ApiResponse, ApiBearerAuth, ApiNoContentResponse } from '@nestjs/swagger';
 import { CuisineService } from './cuisine.service';
 import { CreateCuisineDto } from './dto/create-cuisine.dto';
 import { UpdateCuisineDto } from './dto/update-cuisine.dto';
@@ -34,6 +36,8 @@ export class CuisineController {
     return this.cuisineService.create(createCuisineDto);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(Guard)
   @Get('search')
   @ApiOperation({ summary: 'Get all cuisines with pagination & search (only super admin)' })
   findAll(@Query() query: CuisinePaginationDto) {
@@ -50,6 +54,7 @@ export class CuisineController {
   @UseGuards(Guard)
   @Roles(Role.SUPER_ADMIN)
   @Patch('update/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Update a cuisine by ID (only super admin)' })
   update(@Param('id') id: number, @Body() updateCuisineDto: UpdateCuisineDto) {
     return this.cuisineService.update(id, updateCuisineDto);

@@ -7,7 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { SessionModule } from 'src/session/session.module';
 import { UserModule } from 'src/user/user.module';
 import { EmailModule } from 'src/email/email.module';
-import { RestaurantProfileModule } from 'src/restaurant-profile/restaurant-profile.module';
+import { RestaurantModule } from 'src/restaurant/restaurant.module';
 
 @Module({
     imports: [
@@ -16,7 +16,7 @@ import { RestaurantProfileModule } from 'src/restaurant-profile/restaurant-profi
         SessionModule,
         UserModule,
         EmailModule,
-        RestaurantProfileModule
+        RestaurantModule
     ],
     controllers: [AuthController],
     providers: [AuthService],

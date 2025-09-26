@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Transform, Type } from 'class-transformer';
 import { BusinessType } from '../enums/business-type.enum';
 
-export class RestaurantProfileResponseDto {
+export class RestaurantResponseDto {
   @Expose()
   @ApiProperty()
   id: number;

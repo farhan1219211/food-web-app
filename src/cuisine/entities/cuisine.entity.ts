@@ -7,8 +7,8 @@ import {
   ManyToMany,
   OneToMany,
 } from 'typeorm';
-import { RestaurantProfile } from 'src/restaurant-profile/entities/restaurant-profile.entity';
-import { MenuItem } from 'src/menu-items/entities/menu-item.entity';
+import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
+import { Menu } from 'src/menu/entities/menu.entity';
 @Entity()
 export class Cuisine {
   @PrimaryGeneratedColumn()
@@ -17,11 +17,11 @@ export class Cuisine {
   @Column({ unique: true })
   name: string;
 
-  @ManyToMany(() => RestaurantProfile, (restaurant) => restaurant.cuisines)
-  restaurants: RestaurantProfile[];
+  @ManyToMany(() => Restaurant, (restaurant) => restaurant.cuisines)
+  restaurants: Restaurant[];
 
-  @OneToMany(() => MenuItem, (menuItem) => menuItem.cuisine)
-  menuItems: MenuItem[];
+  @OneToMany(() => Menu, (menu) => menu.cuisine)
+  menu: Menu[];
 
 
   @CreateDateColumn({ name: 'created_at' })
