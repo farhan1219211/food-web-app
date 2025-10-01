@@ -6,11 +6,15 @@ import {
   UpdateDateColumn,
   ManyToOne,
   RelationId,
+  OneToMany,
 } from 'typeorm';
 import { Restaurant
  } from 'src/restaurant/entities/restaurant.entity';
 import { Cuisine } from 'src/cuisine/entities/cuisine.entity';
 import { CreateMenuDto } from '../dto/create-menu.dto';
+import { Favourite } from 'src/favourite/entities/favourite.entity';
+import { CartDish } from 'src/cart-dishes/entities/cart-dish.entity';
+import { OrderDishes } from 'src/order/entities/order-dishes.entity';
 
 @Entity()
 export class Menu {
@@ -41,6 +45,15 @@ export class Menu {
   cuisine: Cuisine;
   @RelationId((menu: Menu) => menu.cuisine)
   cuisineId: number;
+
+  @OneToMany(() => Favourite, (favourite) => favourite.menu, { cascade: true })
+  favourites: Favourite[];
+
+  @OneToMany(() => CartDish, (cartDish) => cartDish.menu, {cascade: true})
+  cartDishes: CartDish[];
+
+  @OneToMany(() => OrderDishes, (orderDish)=> orderDish.dish, {cascade: true})
+  orderDishes: OrderDishes[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

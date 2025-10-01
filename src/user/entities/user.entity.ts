@@ -14,6 +14,9 @@ import { Auth } from 'src/auth/entity/auth.entity';
 import { IsOptional } from 'class-validator';
 import { Session } from 'src/session/entity/session.entity';
 import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
+import { Favourite } from 'src/favourite/entities/favourite.entity';
+import { Cart } from 'src/cart/entities/cart.entity';
+import { Order } from 'src/order/entities/order.entity';
 
 @Entity()
 export class User {
@@ -48,6 +51,9 @@ export class User {
     })
     auth: Auth;
 
+    @OneToOne( ()=> Cart, (cart) => cart.user, {nullable: true})
+    cart: Cart;
+
     @OneToMany(() => Session, (session) => session.user, { cascade: true })
     sessions: Session[];
 
@@ -63,6 +69,11 @@ export class User {
     @OneToOne(() => Restaurant, (restaurant) => restaurant.restaurantAdmin)
     restaurant: Restaurant;
 
+    @OneToMany(()=> Favourite, (favourite) => favourite.user, {cascade: true})
+    favourite: Favourite[];
+
+    @OneToMany(()=>Order, (order) => order.customer, {nullable: true})
+    order: Order[]
 
     from(userDto: CreateUserDto) {
         this.fullName = userDto.fullName;

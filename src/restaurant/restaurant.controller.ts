@@ -9,8 +9,8 @@ import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { RestaurantPaginationDto } from './dto/pagination-search.dto';
 
 
-@ApiTags('Restaurant Profile')
-@Controller('restaurant-profile')
+@ApiTags('Restaurant')
+@Controller('restaurant')
 export class RestaurantController {
   constructor(private readonly restaurantService: RestaurantService) {}
 

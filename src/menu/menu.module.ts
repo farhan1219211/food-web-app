@@ -16,5 +16,6 @@ import { CuisineModule } from 'src/cuisine/cuisine.module';
     CuisineModule],
   controllers: [MenuController],
   providers: [MenuService],
+  exports: [MenuService]
 })
 export class MenuModule {}

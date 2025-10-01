@@ -4,13 +4,14 @@ import { AuthModule } from './auth/auth.module';
 import { SessionModule } from './session/session.module';
 import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { Auth } from './auth/entity/auth.entity';
-import { User } from './user/entities/user.entity';
-import { Session } from './session/entity/session.entity';
 import { EmailModule } from './email/email.module';
 import { RestaurantModule } from './restaurant/restaurant.module';
 import { CuisineModule } from './cuisine/cuisine.module';
 import { MenuModule } from './menu/menu.module';
+import { FavouriteModule } from './favourite/favourite.module';
+import { CartModule } from './cart/cart.module';
+import { CartDishesModule } from './cart-dishes/cart-dishes.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
     imports: [
@@ -24,7 +25,7 @@ import { MenuModule } from './menu/menu.module';
         //     username: configService.get<string>('DB_USER', 'postgres'),
         //     password: configService.get<string>('DB_PASS', '1234'),
         //     database: configService.get<string>('DB_NAME', 'food_backend'),
-        //     entities: [Auth, User, Session],
+        //     autoLoadEntities:true,
         //     synchronize: true,
         //     logging: true,
         //   }),
@@ -47,6 +48,10 @@ import { MenuModule } from './menu/menu.module';
         RestaurantModule,
         CuisineModule,
         MenuModule,
+        FavouriteModule,
+        CartModule,
+        CartDishesModule,
+        OrderModule,
     ],
 })
 export class AppModule {}

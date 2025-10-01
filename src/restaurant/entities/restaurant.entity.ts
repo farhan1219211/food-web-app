@@ -16,6 +16,7 @@ import { BusinessType } from '../enums/business-type.enum';
 import { Cuisine } from 'src/cuisine/entities/cuisine.entity';
 import { Point } from 'geojson';
 import { CreateRestaurantDto } from 'src/auth/dto/create-restaurant.dto';
+import { IsEnum } from 'class-validator';
 import { Menu } from 'src/menu/entities/menu.entity';
 
 
@@ -125,7 +126,7 @@ static from(dto: CreateRestaurantDto, restaurantAdmin: User): Restaurant {
   restaurant.restaurantAdmin = restaurantAdmin;
 
   // convert latitude and longitude into  Point
-  // restaurant.location = `POINT(${dto.longitude} ${dto.latitude})`
+  restaurant.location = `POINT(${dto.longitude} ${dto.latitude})`
   restaurant.cordinate = {
     type: 'Point',
     coordinates: [dto.longitude, dto.latitude],

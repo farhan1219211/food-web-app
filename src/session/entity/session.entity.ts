@@ -8,10 +8,9 @@ import {
     JoinColumn,
     RelationId,
 } from 'typeorm';
-import { Auth } from 'src/auth/entity/auth.entity';
 import { User } from 'src/user/entities/user.entity';
 
-@Entity('sessions')
+@Entity()
 export class Session {
     @PrimaryGeneratedColumn()
     id: number;

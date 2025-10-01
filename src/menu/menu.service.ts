@@ -12,6 +12,7 @@ import { plainToInstance } from 'class-transformer';
 import { MenuPaginationDto } from './dto/menu-pagination.dto';
 import { AdminMenuPaginationDto } from './dto/admin-menu-pagination.dto';
 import { Role } from 'src/common/enum/role.enum';
+import { zip } from 'rxjs';
 
 @Injectable()
 export class MenuService {
@@ -27,7 +28,13 @@ export class MenuService {
       if(!restaurant){
         throw new NotFoundException('Check you restaurant status')
       }
-      
+      // cuisine belongs to restaurant
+      const allowedCuisineIds = restaurant.cuisines.map(c => c.id);
+      if (!allowedCuisineIds.includes(createMenuDto.cuisineId)) {
+        throw new BadRequestException(
+          `This cuisine is not available for your restaurant. Please add it first.`,
+        );
+      }
 
       // fetch cuisine
       const cuisine = await this.cuisineService.findOne(createMenuDto.cuisineId);
@@ -43,6 +50,23 @@ export class MenuService {
     });
     } catch (error) {
       throw new BadRequestException(error.message);
+    }
+  }
+
+  // get dish by id
+  async getDish(id: number){
+    try {
+      const dish = await this.menuRepository.findOne({
+        where: { id },
+        relations: ['restaurant']
+      });
+      if(!dish){
+        throw new NotFoundException(`dish with Id ${id} not found`);
+      }
+
+      return dish;
+    } catch (error) {
+      throw new NotFoundException(error.message);
     }
   }
 

@@ -52,9 +52,7 @@ export class AuthController {
     @Roles(Role.SUPER_ADMIN)
     @Post('add-super-admin')
     @ApiOperation({ summary: 'Create super admin account (only super admin)' })
-    async createSuperAdmin(
-        @Body() createUserDto: CreateUserDto,
-        @GetUser('email') email: string,
+    async createSuperAdmin(@Body() createUserDto: CreateUserDto, @GetUser('email') email: string,
     ): Promise<UserResponse> {
         return this.authService.createSuperAdmin(createUserDto, email, Role.SUPER_ADMIN);
     }
