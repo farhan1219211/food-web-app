@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Transform, Type } from 'class-transformer';
 import { BusinessType } from '../enums/business-type.enum';
+import { CuisineResponseDto } from 'src/cuisine/dto/response.dto';
 
 export class RestaurantResponseDto {
   @Expose()
@@ -43,8 +44,11 @@ export class RestaurantResponseDto {
   @ApiProperty({ required: false })
   description?: string;
 
-  @ApiProperty()
-  cuisines: string[]
+  @Expose()
+  @ApiProperty({ type: () => [CuisineResponseDto] })
+  @Type(() => CuisineResponseDto)  
+  cuisines: CuisineResponseDto[];
+
 
   @Expose()
   @ApiProperty()

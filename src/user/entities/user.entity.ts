@@ -17,8 +17,9 @@ import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
 import { Favourite } from 'src/favourite/entities/favourite.entity';
 import { Cart } from 'src/cart/entities/cart.entity';
 import { Order } from 'src/order/entities/order.entity';
+import { Review } from 'src/review/entities/review.entity';
 
-@Entity()
+@Entity('users')
 export class User {
     @PrimaryGeneratedColumn()
     id: number;
@@ -74,6 +75,9 @@ export class User {
 
     @OneToMany(()=>Order, (order) => order.customer, {nullable: true})
     order: Order[]
+
+    @OneToMany(() => Review, (review) => review.customer)
+    reviews: Review[];
 
     from(userDto: CreateUserDto) {
         this.fullName = userDto.fullName;

@@ -3,7 +3,7 @@ import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Menu } from './entities/menu.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { RestaurantService } from 'src/restaurant/restaurant.service';
 import { CuisineService } from 'src/cuisine/cuisine.service';
@@ -54,14 +54,22 @@ export class MenuService {
   }
 
   // get dish by id
-  async getDish(id: number){
+  async getDish(id: number) {
     try {
       const dish = await this.menuRepository.findOne({
-        where: { id },
-        relations: ['restaurant']
+        where: {
+          id,
+          restaurant: { deletedAt: IsNull() },
+        },
+        relations: ['restaurant'],
       });
-      if(!dish){
-        throw new NotFoundException(`dish with Id ${id} not found`);
+      if(!dish?.restaurant){
+        throw new BadRequestException('Currently Unavailable')
+      }
+      if (!dish) {
+        throw new NotFoundException(
+          `Dish with ID ${id} not found `,
+        );
       }
 
       return dish;
@@ -69,6 +77,7 @@ export class MenuService {
       throw new NotFoundException(error.message);
     }
   }
+
 
   // restaurant admin can fetch his all orders
   async findByAdmin(adminId: number, { page, limit }: AdminMenuPaginationDto ): Promise<{ data: PublicMenuDto[]; total: number; page: number; limit: number }> {
@@ -211,6 +220,24 @@ export class MenuService {
       throw new BadRequestException('Failed to remove menu item: ' + error.message);
     }
   }
+
+  // update the reviiew
+    async updateReview(dishId: number, avgRating: number): Promise<void> {
+    try {
+        console.log("update review functioin is called");
+        const product = await this.menuRepository.findOne({ where: { id: dishId } });
+
+        if (!product) {
+        throw new NotFoundException(`Dish with ID ${dishId} not found`);
+        }
+
+        await this.menuRepository.update(dishId, {
+        rating: Number(avgRating.toFixed(1)),
+        });
+    } catch (error) {
+        throw new BadRequestException(`Failed to update product review: ${error.message}`);
+    }
+    }
 
 
 }

@@ -14,6 +14,8 @@ import { SessionService } from 'src/session/session.service';
 import { toUserResponse, UserResponse } from 'src/common/utils/user.mapper';
 import { Role } from 'src/common/enum/role.enum';
 import { not } from 'rxjs/internal/util/not';
+import { UserAuthResponse } from './dto/user.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UserService {
@@ -120,7 +122,7 @@ export class UserService {
     }
 
     // get user profile
-    async findOne(userId: number): Promise<User> {
+    async findOne(userId: number) {
         try {
             const user = await this.userRepository.findOne({
                 where: { id: userId },
@@ -130,7 +132,7 @@ export class UserService {
             if (!user) {
                 throw new NotFoundException('User not found');
             }
-            return user;
+            return user; // don't modify the return type because it's directly linked with guard
         } catch (error) {
             throw new NotFoundException(error.message || 'Failed to fetch profile');
         }

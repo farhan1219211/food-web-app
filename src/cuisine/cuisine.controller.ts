@@ -39,16 +39,11 @@ export class CuisineController {
   @ApiBearerAuth()
   @UseGuards(Guard)
   @Get('search')
-  @ApiOperation({ summary: 'Get all cuisines with pagination & search (only super admin)' })
+  @ApiOperation({ summary: 'Get all cuisines with pagination & search' })
   findAll(@Query() query: CuisinePaginationDto) {
     return this.cuisineService.findAll(query);
   }
 
-  // @Get('get/:id')
-  // @ApiOperation({ summary: 'Get a cuisine by ID' })
-  // findOne(@Param('id') id: number) {
-  //   return this.cuisineService.findOne(id);
-  // }
 
   @ApiBearerAuth()
   @UseGuards(Guard)

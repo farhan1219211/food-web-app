@@ -30,27 +30,36 @@ export class RestaurantService {
   // update the restaurant profile
   async update(adminId: number, dto: UpdateRestaurantDto) {
     try {
-
-      const cuisines = dto?.cuisines? await this.cuisineService.findAllByIds(dto.cuisines): [];
-      console.log(cuisines);
       const restaurant = await this.restaurantRepository.findOne({
         where: { restaurantAdmin: { id: adminId } },
-        relations: ['cuisines'], 
+        relations: ['cuisines'],
       });
 
       if (!restaurant) {
         throw new NotFoundException('Restaurant not found');
       }
 
-      // Merge updates
-      Object.assign(restaurant, dto, { cuisines });
-      console.log(restaurant);
+      // If cuisines are provided in DTO
+      if (dto?.cuisines?.length) {
+        const newCuisines = await this.cuisineService.findAllByIds(dto.cuisines);
+
+        //  old + new 
+        restaurant.cuisines = [
+          ...restaurant.cuisines,
+          ...newCuisines.filter(
+            nc => !restaurant.cuisines.some(c => c.id === nc.id),
+          ),
+        ];
+      }
+      Object.assign(restaurant, { ...dto, cuisines: restaurant.cuisines });
+
       await this.restaurantRepository.save(restaurant);
       return 'Restaurant updated successfully';
     } catch (error) {
       throw new BadRequestException(error.message || 'Failed to update restaurant');
     }
   }
+
 
 
   // search restaurants
@@ -94,6 +103,7 @@ export class RestaurantService {
         });
       }
 
+
       // filter by open/closed status
       if (typeof isOpen === 'boolean') {
         qb.andWhere('restaurant.isOpen = :isOpen', { isOpen });
@@ -120,7 +130,7 @@ export class RestaurantService {
       }
 
       const [restaurants, total] = await qb.getManyAndCount();
-
+      console.log(restaurants);
       // const data = restaurants.map(toRestaurantResponse);
       const data = plainToInstance(RestaurantResponseDto, restaurants);
       return {

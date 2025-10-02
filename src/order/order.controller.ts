@@ -10,6 +10,7 @@ import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { OrdersPaginatedResponseDto } from './dto/order-paginated-response.dto';
 import { OrderStatus } from './enum/order-status.enum';
 import { OrderFilterDto } from './dto/order-filter.dto';
+import { GetRestaurantOrdersDto } from './dto/restaurant-orders.dto';
 
 @Controller('order')
 export class OrderController {
@@ -22,14 +23,14 @@ export class OrderController {
   @UseGuards(Guard)
   @Roles(Role.CUSTOMER)
   @Post('customer/place-order')
-  async placeOrder(@GetUser('id') customerId: number, @Body() createOrderDto: CreateOrderDto) {
-      return this.orderService.placeOrder(customerId, createOrderDto);
+  async placeOrder(@GetUser() customer: any, @Body() createOrderDto: CreateOrderDto) {
+      return this.orderService.placeOrder(customer, createOrderDto);
   }
 
 
   @Get('get-all-orders')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Customer create new order'})
+  @ApiOperation({ summary: 'Customer fetches all of his orders'})
   @UseGuards(Guard)
   @ApiOperation({ summary: 'Get all orders of a user with pagination and optional status filter' })
   @ApiResponse({ status: 200, type: OrdersPaginatedResponseDto })
@@ -60,8 +61,20 @@ export class OrderController {
     return this.orderService.updateStatus(user, Number(id), dto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderService.remove(+id);
+  @ApiBearerAuth()
+  @UseGuards(Guard)
+  @Roles(Role.RESTAURANT_ADMIN)
+  @Get('restaurant-orders')
+  @ApiOperation({ summary: 'Get all orders received by restaurant admin' })
+  findAllForRestaurantAdmin( @GetUser('id') adminId: number, @Query() query: GetRestaurantOrdersDto,
+  ) 
+  {
+    return this.orderService.findAllForRestaurantAdmin( adminId, query.page, query.limit, query.status,);
   }
+
+
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.orderService.remove(+id);
+  // }
 }

@@ -13,6 +13,7 @@ import {
 import { OrderStatus } from '../enum/order-status.enum';
 import { CreateOrderDto } from '../dto/create-order.dto';
 import { OrderDishes } from './order-dishes.entity';
+import { Review } from 'src/review/entities/review.entity';
 
 @Entity()
 export class Order {
@@ -36,6 +37,10 @@ export class Order {
     default: OrderStatus.PENDING,
   })
   status: OrderStatus;
+
+  @OneToMany(() => Review, (review) => review.order)
+  reviews: Review[];
+
 
   @Column()
   shippingAddress: string;

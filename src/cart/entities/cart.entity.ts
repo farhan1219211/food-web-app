@@ -1,4 +1,4 @@
-import { CartDish } from "src/cart-dishes/entities/cart-dish.entity";
+import { CartDish } from "src/cart/entities/cart-dish.entity";
 import { User } from "src/user/entities/user.entity";
 import { Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 

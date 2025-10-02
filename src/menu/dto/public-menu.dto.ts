@@ -26,6 +26,9 @@ export class PublicMenuDto extends PickType(MenuDto, [
   price: number;
 
   @Expose()
+  rating: number;
+
+  @Expose()
   isAvailable: boolean;
 
   @Expose()

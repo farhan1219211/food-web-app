@@ -13,9 +13,9 @@ import { Restaurant
 import { Cuisine } from 'src/cuisine/entities/cuisine.entity';
 import { CreateMenuDto } from '../dto/create-menu.dto';
 import { Favourite } from 'src/favourite/entities/favourite.entity';
-import { CartDish } from 'src/cart-dishes/entities/cart-dish.entity';
 import { OrderDishes } from 'src/order/entities/order-dishes.entity';
-
+import { CartDish } from 'src/cart/entities/cart-dish.entity';
+import { Review } from 'src/review/entities/review.entity';
 @Entity()
 export class Menu {
   @PrimaryGeneratedColumn()
@@ -29,6 +29,14 @@ export class Menu {
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
+
+  @Column({
+  type: 'decimal',
+  precision: 2,
+  scale: 1,
+  default: 0
+  })
+  rating: number;
 
   @Column({ default: true })
   isAvailable: boolean;
@@ -53,7 +61,10 @@ export class Menu {
   cartDishes: CartDish[];
 
   @OneToMany(() => OrderDishes, (orderDish)=> orderDish.dish, {cascade: true})
-  orderDishes: OrderDishes[];
+  orderDishes: OrderDishes;
+
+  @OneToMany(() => Review, (review) => review.dish)
+  reviews: Review[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

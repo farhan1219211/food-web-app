@@ -42,8 +42,8 @@ export class Restaurant {
   @Column()
   location: string;
 
-  @Column({ type: 'geometry', spatialFeatureType: 'Point', srid: 4326, nullable: true })
-  cordinate: Point; 
+  // @Column({ type: 'geometry', spatialFeatureType: 'Point', srid: 4326, nullable: true })
+  // cordinate: Point; 
 
   @Column()
   city: string;
@@ -126,11 +126,11 @@ static from(dto: CreateRestaurantDto, restaurantAdmin: User): Restaurant {
   restaurant.restaurantAdmin = restaurantAdmin;
 
   // convert latitude and longitude into  Point
-  restaurant.location = `POINT(${dto.longitude} ${dto.latitude})`
-  restaurant.cordinate = {
-    type: 'Point',
-    coordinates: [dto.longitude, dto.latitude],
-  }
+  // restaurant.location = `POINT(${dto.longitude} ${dto.latitude})`
+  // restaurant.cordinate = {
+  //   type: 'Point',
+  //   coordinates: [dto.longitude, dto.latitude],
+  // }
   return restaurant;
 }
 }

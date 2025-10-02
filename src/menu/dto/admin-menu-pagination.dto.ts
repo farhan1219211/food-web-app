@@ -15,12 +15,10 @@ export class AdminMenuPaginationDto {
 
   @ApiPropertyOptional({
     description: 'Items per page (default 10)',
-    enum: [10, 20],
     example: 10,
     default: 10,
   })
   @Type(() => Number)
   @IsInt()
-  @IsIn([10, 20], {message: 'limit must be either 10 or 20'})
   limit: number = 10;
 }

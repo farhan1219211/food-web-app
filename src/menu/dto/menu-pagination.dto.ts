@@ -14,7 +14,7 @@ export class MenuPaginationDto {
   page: number = 1;
 
   @ApiPropertyOptional({
-    description: 'Number of items per page (only 10 or 20 allowed)',
+    description: 'Number of items per page )',
     example: 10,
     default: 10,
   })

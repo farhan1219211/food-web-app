@@ -19,6 +19,8 @@ import { Role } from 'src/common/enum/role.enum';
 import { PaginationDto } from './dto/paginatioin.dto';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { UserResponse } from 'src/common/utils/user.mapper';
+import { plainToInstance } from 'class-transformer';
+import { UserAuthResponse } from './dto/user.dto';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -49,8 +51,11 @@ export class UserController {
     @Roles(Role.CUSTOMER, Role.RESTAURANT_ADMIN, Role.SUPER_ADMIN)
     @Get('profile')
     @ApiOperation({ summary: 'Get current logged-in user profile' })
-    findOne(@GetUser('id') authId: number): Promise<UserResponse> {
-        return this.userService.findOne(authId);
+    async findOne(@GetUser('id') authId: number) {
+        const user = await this.userService.findOne(authId);
+        return plainToInstance(UserAuthResponse, { ...user, email: user.auth?.email }, {
+            excludeExtraneousValues: true,
+        }, );
     }
 
     // self delete account

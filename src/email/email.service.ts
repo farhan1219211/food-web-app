@@ -122,4 +122,36 @@ export class EmailService {
             await this.sendEmail(createdByEmail, 'New Super Admin Account Created', htmlForCreator);
         }
     }
+
+    // Order confirmation for customer
+    async sendOrderConfirmationToCustomer(to: string, order: any) {
+    const html = `
+        <p>Hello,</p>
+        <p>Thank you for your order!</p>
+        <p><b>Order ID:</b> ${order.id}</p>
+        <p><b>Total Amount:</b> ${order.totalPrice}</p>
+        <p><b>Status:</b> ${order.status}</p>
+        <p>We’ll notify you once your order is confirmed and prepared.</p>
+        <br/>
+        <p>Thanks,<br/>Food Web Platform</p>
+    `;
+    return this.sendEmail(to, `Order Confirmation - #${order.id}`, html);
+    }
+
+    // Order notification for restaurant admin
+    async sendOrderNotificationToRestaurant(to: string, order: any, customerEmail: string) {
+    const html = `
+        <p>Hello Restaurant Admin,</p>
+        <p>A new order has been placed by <b>${customerEmail}</b>.</p>
+        <p><b>Order ID:</b> ${order.id}</p>
+        <p><b>Total Amount:</b> ${order.totalPrice}</p>
+        <p><b>Status:</b> ${order.status}</p>
+        <p>Please log in to the admin panel to manage this order.</p>
+        <br/>
+        <p>Thanks,<br/>Food Web Platform</p>
+    `;
+    return this.sendEmail(to, `New Order Received - #${order.id}`, html);
+    }
+
+
 }

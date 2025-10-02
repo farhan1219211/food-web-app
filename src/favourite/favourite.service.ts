@@ -25,7 +25,8 @@ export class FavouriteService {
       favoruite.user = {id: customerId} as User;
       favoruite.menu = {id: dish.id } as Menu;
       console.log("value of favourite is: ", favoruite);
-      return await this.favouriteRepository.save(favoruite);
+      await this.favouriteRepository.save(favoruite);
+      return `Dish ${dish.name} is added to you favourite list`
   }catch(error){
     if (error.code === '23505') {
       throw new BadRequestException(`This dish is already in your favourites`);
@@ -65,7 +66,7 @@ export class FavouriteService {
         );
       }
 
-      return { message: 'Favourite removed successfully' };
+      return { message: 'removed successfully' };
     } catch (error) {
       throw new BadRequestException(error.message);
     }

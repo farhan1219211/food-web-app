@@ -39,14 +39,15 @@ export class Guard implements CanActivate {
             }
             const session = await this.sessionService.findSessionByAccessToken(accessToken);
             if (!session) throw new UnauthorizedException('Session not found');
-
+            // console.log("payload is: ", payload);
             // getting updated user role from database
             const user = await this.userService.findOne(payload.id);
             if (!user) {
                 throw new NotFoundException(`User with id not found`);
             }
+            // console.log("user is : ", user);
             payload.role = user.role;
-
+            // console.log("payload is: ", payload);
             // session expiry handling
             const currentTime = new Date();
             const expiresAt = new Date(session.expiresAt);

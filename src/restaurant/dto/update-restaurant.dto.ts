@@ -19,6 +19,11 @@ export class UpdateRestaurantDto {
   @IsString()
   coverImageUrl?: string;
 
+  @ApiPropertyOptional({ example: 'pizzahuti8@gmail.com', description: 'Restaurant email' })
+  @IsOptional()
+  @IsString()
+  email?: string;
+
   @ApiPropertyOptional({ example: 'Delicious pizza and fast food', description: 'Description of the restaurant' })
   @IsOptional()
   @IsString()
