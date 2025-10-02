@@ -49,11 +49,6 @@ export class Guard implements CanActivate {
             payload.role = user.role;
             // console.log("payload is: ", payload);
             // session expiry handling
-            const currentTime = new Date();
-            const expiresAt = new Date(session.expiresAt);
-            if (expiresAt < currentTime) {
-                throw new UnauthorizedException('Session expired');
-            }
             request.user = payload;
 
             if (requiredRoles && !requiredRoles.map((role) => role).includes(payload.role)) {

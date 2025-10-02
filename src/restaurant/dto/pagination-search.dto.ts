@@ -102,15 +102,6 @@ export class RestaurantPaginationDto {
   maxRating?: number;
 
   @ApiPropertyOptional({
-    description: 'Minimum order amount filter',
-    nullable: true,
-  })
-  @Type(() => Number)
-  @IsOptional()
-  @IsNumber()
-  minOrderAmount?: number;
-
-  @ApiPropertyOptional({
     description: 'Maximum order amount filter',
     nullable: true,
   })

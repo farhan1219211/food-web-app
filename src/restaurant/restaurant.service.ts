@@ -65,7 +65,7 @@ export class RestaurantService {
   // search restaurants
   async findAll( query: RestaurantPaginationDto): Promise<{
     data: any[]; total: number; page: number; limit: number; message?: string;}> {
-    const { page = 1, limit = 10, search, city, businessType, cuisineNames, isOpen, minRating, maxRating, minOrderAmount, maxOrderAmount} = query;
+    const { page = 1, limit = 10, search, city, businessType, cuisineNames, isOpen, minRating, maxRating} = query;
     try {
       const qb = this.restaurantRepository
         .createQueryBuilder('restaurant')
@@ -117,18 +117,6 @@ export class RestaurantService {
         qb.andWhere('restaurant.rating <= :maxRating', { maxRating });
       }
 
-      // filter by min/max order amount
-      if (minOrderAmount) {
-        qb.andWhere('restaurant.minOrderAmount >= :minOrderAmount', {
-          minOrderAmount,
-        });
-      }
-      if (maxOrderAmount) {
-        qb.andWhere('restaurant.minOrderAmount <= :maxOrderAmount', {
-          maxOrderAmount,
-        });
-      }
-
       const [restaurants, total] = await qb.getManyAndCount();
       console.log(restaurants);
       // const data = restaurants.map(toRestaurantResponse);
@@ -164,26 +152,6 @@ export class RestaurantService {
       throw new NotFoundException(error.message);
     }
   }
-
-  // soft remove(not going to used, just for practice purpose)
-  // async softDelete(id: number) {
-  //   try {
-  //     const restaurant = await this.restaurantRepository.findOne({
-  //       where: { id },
-  //       relations: ['restaurantAdmin'],
-  //     });
-
-  //     if (!restaurant) {
-  //       throw new NotFoundException('Restaurant profile not found');
-  //     }
-  //     await this.restaurantRepository.softRemove(restaurant);
-  //     return {
-  //       message: `Restaurant profile with id ${id} has been soft deleted`,
-  //     };
-  //   } catch (error) {
-  //     throw new NotFoundException(error.message);
-  //   }
-  // }
 
     // soft delete
   async softDelete(id: number) {

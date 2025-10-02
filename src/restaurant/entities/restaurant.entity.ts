@@ -77,9 +77,6 @@ export class Restaurant {
   @Column({nullable: true})
   registrationNumber?: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, nullable: true})
-  minOrderAmount: number;
-
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, nullable: true })
   deliveryFee: number;
 

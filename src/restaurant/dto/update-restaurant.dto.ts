@@ -37,12 +37,6 @@ export class UpdateRestaurantDto {
   cuisines?: number[];
 
 
-  @ApiPropertyOptional({ example: 1, description: 'Minimum order amount' })
-  @IsOptional()
-  @IsNumber()
-  @Type(() => Number)
-  minOrderAmount?: number;
-
   @ApiPropertyOptional({ example: 200, description: 'Delivery fee in PKR' })
   @IsOptional()
   @IsNumber()

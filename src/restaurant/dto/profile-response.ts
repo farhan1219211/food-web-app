@@ -49,11 +49,6 @@ export class RestaurantResponseDto {
   @Type(() => CuisineResponseDto)  
   cuisines: CuisineResponseDto[];
 
-
-  @Expose()
-  @ApiProperty()
-  minOrderAmount: number;
-
   @Expose()
   @ApiProperty()
   deliveryFee: number;
